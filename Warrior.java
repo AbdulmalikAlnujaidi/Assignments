@@ -12,7 +12,6 @@ public class Warrior {
         level = 1;
         exp = 100;
         rank = "Pushover";
-        String battleOutcome;
     }
 
     public int level(){
