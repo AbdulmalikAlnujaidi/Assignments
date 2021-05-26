@@ -1,11 +1,15 @@
-import java.util.Scanner;
+//import java.util.Scanner;
 
 public class WarriorMain {
 
     public static void main(String[] args) {
     
-        System.out.println("Test");
-        System.out.println("main push");
+        //Scanner input = new Scanner(System.in);
+
+        Warrior bruce = new Warrior();
+        bruce.rank();
+        bruce.setLevel(81);
+        bruce.rank();
 
     }
 
