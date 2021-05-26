@@ -53,7 +53,6 @@ public class Warrior {
 
     public String training(String achievement, int expGain, int minLevel){
         if (minLevel>getLevel()) {
-            System.out.println("Not strong enough");
             return "Not strong enough";
         } else {
             achievements.add(achievement);
@@ -75,7 +74,7 @@ public class Warrior {
         } 
         else if(level - getLevel() >= 1){
             setExp(getExp() + ( 20 * (level - getLevel()) * (level - getLevel())));
-            return "Intense fight";
+            return "An intense fight";
             // enemy one level higher or more
         }   
         else if(level - getLevel() == 0){
