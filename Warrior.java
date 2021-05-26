@@ -1,82 +1,100 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Warrior {
     
     int exp;
     int level;
     String rank;
+    List<String> achievements = new ArrayList<>();
 
     public Warrior() {
         level = 1;
         exp = 100;
         rank = "Pushover";
+        String battleOutcome;
     }
 
-    public void level(){
-        System.out.println(getLevel()); 
+    public int level(){
+        return getLevel();
     }
 
-    public void experience(){
-        System.out.println(getExp());
+    public int experience(){
+        return getExp();
     }
 
-    public void rank(){
-        if(getLevel()<=9){
-            System.out.println("Pushover");
+    public String rank(){
+        if(getLevel()<=9 && getLevel()>=1){
+            return "Pushover";
         } else if(getLevel()<=19){
-            System.out.println("Novice");
+            return "Novice";
         } else if(getLevel()<=29){
-            System.out.println("Fighter");
+            return "Fighter";
         } else if(getLevel()<=39){
-            System.out.println("Warrior");
+            return "Warrior";
         } else if(getLevel()<=49){
-            System.out.println("Veteran");
+            return "Veteran";
         } else if(getLevel()<=59){
-            System.out.println("Sage");
+            return "Sage";
         } else if(getLevel()<=69){
-            System.out.println("Elite");
+            return "Elite";
         } else if(getLevel()<=79){
-            System.out.println("Conqueror");
+            return "Conqueror";
         } else if(getLevel()<=89){
-            System.out.println("Champion");
+            return "Champion";
         } else if(getLevel()<=99){
-            System.out.println("Master");
-        } else if(getLevel()==100)
-        System.out.println("Greatest");
+            return "Master";
+        } 
+        return "Greatest";
     }
 
-    public String achiemvements(){
-        return "";
+    public List<String> achievements(){
+        return achievements;
     }
 
-    public String training(){
-        return "";
+    public String training(String achievement, int expGain, int minLevel){
+        if (minLevel>getLevel()) {
+            System.out.println("Not strong enough");
+            return "Not strong enough";
+        } else {
+            achievements.add(achievement);
+            setExp(getExp()+expGain);
+        }   
+        return achievement;
+
     }
 
-    public void battle(int level){
+    public String battle(int level){
         
         if(level <= 0 || level > 100){
-            System.out.println("invalid level");
+            return "Invalid level";
+             // level above or under the acceptable value
         }
-        else if(level - getLevel() >= 5 && level%10 < getLevel()){
-            System.out.println("You've been defeated");
-        }
+        else if(level - getLevel() >= 5 && level/10 != getLevel()/10){
+            return "You've been defeated";
+            // enemy is at least one rank higher and enemy level is 5 levels or higher than your warrior
+        } 
         else if(level - getLevel() >= 1){
-            System.out.println("Intense fight!");
+            setExp(getExp() + ( 20 * (level - getLevel()) * (level - getLevel())));
+            return "Intense fight";
+            // enemy one level higher or more
+        }   
+        else if(level - getLevel() == 0){
+            setExp(getExp() + 10); 
+            return "A good fight";
+            // Same Level
         }
-        else if(getLevel() - level >= 2){
-            System.out.println("Easy fight!");
+        else if(getLevel() - level == 1){
+            setExp(getExp() + 5);
+            return "A good fight";
+            // your warrior one level higher
         }
-        else if(getLevel() - level >= 0){
-            System.out.println("A good fight!");
-        }
+
+        return "Easy fight";
+        // your warrior 2 levels higher or more
+        
     }
 
-    public void rankUp(){
-       // if(getExp())
-    }
-
-    public void gainExp(){
-
-    }
     
     public int getExp() {
         return this.exp;
@@ -84,6 +102,18 @@ public class Warrior {
 
     public void setExp(int exp) {
         this.exp = exp;
+
+        int levelCounter = 0;
+
+        while (exp >= 100) {
+            exp = exp-100;
+            levelCounter++;
+        }
+        if (levelCounter>100) {
+            levelCounter = 100;
+            this.exp = 10000;
+        }
+        setLevel(levelCounter);
     }
 
     public int getLevel() {
