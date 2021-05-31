@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
 
+// The second warrior class, connected to MySQL.
+
 public class Warrior2 {
     
     int warriorID;
