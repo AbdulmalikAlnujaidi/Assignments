@@ -1,0 +1,205 @@
+package JDBC_Example.src;
+import java.util.ArrayList;
+import java.util.List;
+import java.sql.*;
+
+public class Warrior2 {
+    
+    int warriorID;
+    String warriorName;
+    int exp;
+    int level;
+    String rank;
+    List<String> achievements = new ArrayList<>();
+    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/warrior", "root", "mysql");
+    PreparedStatement st;
+    ResultSet rs;
+
+    // I've established the connection in this class instead of the main
+
+    String fetchWarrior = "SELECT * FROM warrior.warrior WHERE warrior.warrior_name = ?;";
+    String fetchWarriorPK = "SELECT PK_warrior FROM warrior.warrior WHERE warrior.warrior_name = ?;";
+    String insertWarriorName = "INSERT INTO warrior.warrior (warrior_name) values (?);";
+    String insertWarriorAchievements = "INSERT INTO warrior.achievements (PK_warrior, achievements) values (?,?);";
+    String updateWarriorName = "UPDATE warrior.warrior SET warrior.warrior_name = ? WHERE warrior.warrior_name = ?;";
+    String updateWarriorLevel = "UPDATE warrior.warrior SET warrior.levelup = ? WHERE warrior.warrior_name = ?;";
+    String updateWarriorRank = "UPDATE warrior.warrior SET warrior.ranking = ? WHERE warrior.warrior_name = ?;";
+    String updateWarriorExp = "UPDATE warrior.warrior SET warrior.exp = ? WHERE warrior.warrior_name = ?;";
+    
+    // I've prepared the queries in here for reusability
+
+    public Warrior2() throws Exception {
+        level = 1;
+        exp = 100;
+        rank = "Pushover";
+    }
+ 
+
+    public Warrior2(String warriorName) throws Exception { // inserts a new warrior once he is created in the constrcutor
+        this.warriorName = warriorName;
+        level = 1;
+        exp = 100;
+        rank = "Pushover";
+        st = conn.prepareStatement(insertWarriorName);
+        st.setString(1, warriorName);
+        st.executeUpdate();
+    }
+
+    public int level(){
+        return getLevel();
+    }
+
+    public int experience(){
+        return getExp();
+    }
+
+    public String rank(){
+        if(getLevel()<=9 && getLevel()>=1){ // return the rank based on the warrior's level
+            return "Pushover";
+        } else if(getLevel()<=19){
+            return "Novice";
+        } else if(getLevel()<=29){
+            return "Fighter";
+        } else if(getLevel()<=39){
+            return "Warrior";
+        } else if(getLevel()<=49){
+            return "Veteran";
+        } else if(getLevel()<=59){
+            return "Sage";
+        } else if(getLevel()<=69){
+            return "Elite";
+        } else if(getLevel()<=79){
+            return "Conqueror";
+        } else if(getLevel()<=89){
+            return "Champion";
+        } else if(getLevel()<=99){
+            return "Master";
+        } 
+        return "Greatest";
+    }
+
+    public String training(String achievement, int expGain, int minLevel) throws Exception {
+        if (minLevel>getLevel()) {
+            return "Not strong enough"; // minimum level isn't higher than warrior's level
+        } else {
+            achievements.add(achievement);
+            int warriorID = getWarriorID();
+            st = conn.prepareStatement(insertWarriorAchievements); // Inserts achievement
+            st.setInt(1, warriorID);
+            st.setString(2, achievement);
+            st.executeUpdate();
+        }
+        setExp(getExp()+expGain); // the exp gained from the training
+        return achievement;
+
+    }
+
+   
+
+    public String battle(int level) throws Exception {
+        
+        if(level <= 0 || level > 100){
+            return "Invalid level";
+             // level above or under the acceptable value
+        }
+        else if(level - getLevel() >= 5 && level/10 != getLevel()/10){
+            return "You've been defeated";
+            // enemy is at least one rank higher and enemy level is 5 levels or higher than your warrior
+        } 
+        else if(level - getLevel() >= 1){
+            setExp(getExp() + ( 20 * (level - getLevel()) * (level - getLevel())));
+            return "An intense fight";
+            // enemy one level higher or more
+        }   
+        else if(level - getLevel() == 0){
+            setExp(getExp() + 10); 
+            return "A good fight";
+            // Same Level
+        }
+        else if(getLevel() - level == 1){
+            setExp(getExp() + 5);
+            return "A good fight";
+            // your warrior one level higher
+        }
+
+        return "Easy fight";
+        // your warrior 2 levels higher or more
+        
+    }
+
+    public int getExp() {
+        return this.exp;
+    }
+
+    public void setExp(int exp) throws Exception {
+        st = conn.prepareStatement(updateWarriorExp); // Update exp
+        st.setInt(1, exp);
+        String warriorName = getWarriorName();
+        st.setString(2, warriorName);
+        st.executeUpdate();
+        this.exp = exp;
+
+        int levelCounter = 0;
+
+        while (exp >= 100) {
+            exp = exp-100;
+            levelCounter++;
+        }
+        if (levelCounter>100) {
+            levelCounter = 100;
+            this.exp = 10000;
+        }
+        setLevel(levelCounter);
+    }
+
+    public int getLevel() {
+        return this.level;
+    }
+
+    public void setLevel(int level) throws Exception{
+        st = conn.prepareStatement(updateWarriorLevel); //Update the Level
+        st.setInt(1, level);
+        String warriorName = getWarriorName();
+        st.setString(2, warriorName);
+        st.executeUpdate();
+        this.level = level;
+
+        st = conn.prepareStatement(updateWarriorRank); //Update the rank
+        st.setString(1, rank());
+        warriorName = getWarriorName();
+        st.setString(2, warriorName);
+        st.executeUpdate();
+    }
+
+    public String getRank() {
+        return this.rank;
+    }
+
+    public void setRank(String rank) {
+        this.rank = rank;
+    }
+    
+    public String getWarriorName() {
+        return this.warriorName;
+    }
+
+    public void setWarriorName(String warriorName) {
+        this.warriorName = warriorName;
+    }
+
+    public List<String> getAchievements() {
+        return this.achievements;
+    }
+
+    public void setAchievements(List<String> achievements) {
+        this.achievements = achievements;
+    }
+
+    public int getWarriorID() throws Exception {
+        return this.warriorID;
+    }
+
+    public void setWarriorID(int warriorID) {
+        this.warriorID = warriorID;
+    }
+}
